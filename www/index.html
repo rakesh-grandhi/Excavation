@@ -1,259 +1,234 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Excavation</title>
+    <head>
+        <title>Excavation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="format-detection" content="telephone=no">
+        <link rel="stylesheet" href="jquery/jquery.mobile-1.3.1.css" />
+        <script src="js/jquery-1.9.1.min.js"></script>
+        <script src="jquery/jquery.mobile-1.3.1.js"></script>
+        <script src="js/myScript.js"></script>
+    </head>
+    <body>
+        <div data-role="page" data-theme="b" id="splash" style="background-color: #fff;" align="center">
+            <div class="splash">
+                <img src="images/splash.png" alt="splash" />
+            </div>
+        </div>
 
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="format-detection" content="telephone=no">
+        <!-- Start of Login page -->
+        <div data-role="page" id="loginform">
+            <div id="logo" align="center" valign="middle">
+                <img id="logo" src="images/logo.jpg" width="100%" height="61"/>
+            </div>
+            <div data-role="header">
+                <h1>Login</h1>
+            </div><!-- /header -->
+            <div data-role="content">
+                <form action="" method="" id="loginform">
+                    <div data-role="fieldcontain" class="ui-hide-label" >
+                        <label for="username">Username:</label>
+                        <input type="text" name="username" id="username" value="" placeholder="Username" data-mini="true" required="required"/>
+                    </div>
+                    <div data-role="fieldcontain" class="ui-hide-label">
+                        <label for="password">Password:</label>
+                        <input type="password" name="password" id="password" value="" placeholder="Password" data-mini="true" required="required"/>
+                    </div>
+                    <div data-role="fieldcontain">
+                        <fieldset data-role="controlgroup">
+                            <input type="checkbox" name="remember" id="remember" data-mini="true" />
+                            <label for="remember">Remember Me</label>
+                        </fieldset>
+                    </div>
+                    <button type="button" data-theme="a" data-mini="true" name="login" id="login" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
+                        Login
+                    </button>
+                </form>
+            </div><!-- /content -->
+        </div><!-- /page -->
 
-		<!--
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.css" />
-		<script src="http://code.jquery.com/mobile/1.1.1/jquery.mobile-1.1.1.min.js"></script>
-		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
-		<script src="js/jquery.mobile-1.1.1.min.js"></script>
-		<script src="js/jqtouch.js"></script>
-		-->
-		<link rel="stylesheet" href="jquery/jquery.mobile-1.3.1.css" />
-		<script src="js/jquery-1.9.1.min.js"></script>
-		<script src="jquery/jquery.mobile-1.3.1.js"></script>
-		<script src="js/myScript.js"></script>
+        <!-- Start of Login Fail page -->
+        <div data-role="dialog" id="loginfail">
+            <div data-role="header" data-theme="d">
+                <h1>Login Failed</h1>
+            </div>
+            <div data-role="content" data-theme="c">
+                <p>
+                    Please enter a valid Username and Password.
+                </p>
+                <a href="#loginform" data-role="button" data-rel="back" data-theme="a">Back to Login</a>
+            </div>
+        </div><!-- /page -->
 
-	</head>
-	<body>
+        <!-- Start of Orders page -->
+        <div data-role="page" id="orders">
+            <div id="logo">
+                <img id="logo" src="images/logo.jpg" width="100%" height="61"/>
+            </div>
+            <div data-role="header">
+                <h1>Orders</h1>
+                <a href="#loginform" data-icon="" class="ui-btn-right" id="logout">Logout</a>
+            </div><!-- /header -->
+            <div data-role="content">
+                <div class="content-primary">
+                    <ul data-role="listview" data-inset="true" data-filter="true" id="order_list"></ul>
+                </div><!--/content-primary -->
+            </div><!-- /content -->
+        </div><!-- /page -->
 
-		<div data-role="page" data-theme="b" id="splash" style="background-color: #fff;" align="center">
-			<div class="splash">
-				<img src="images/splash.png" alt="splash" />
-			</div>
-		</div>
+        <!-- Start of Cut Details page -->
+        <div data-role="page" id="cut">
+            <div id="logo">
+                <img id="logo" src="images/logo.jpg" width="100%" height="61"/>
+            </div>
+            <div data-role="header">
+                <a href="#orders" data-rel="Back" data-icon="back">Orders</a>
+                <h1>Details</h1>
+                <a href="#loginform" data-icon="">Logout</a>
+            </div><!-- /header -->
+            <div data-role="content">
+                <ul data-role="listview" id="details_list">
+                    <li id="ord_header"></li>
+                    <li>
+                        <fieldset data-role="controlgroup" data-mini="true">
+                            <input type="checkbox" name="arrowbn" id="arrowbn" class="custom" />
+                            <label for="arrowbn">Arrowboard Needed</label>
+                        </fieldset>
 
-		<!-- Start of first page -->
-		<div data-role="page" id="loginform">
-			<div id="logo" align="center" valign="middle">
-				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
-			</div>
-			<div data-role="header">
-				<h1>Login</h1>
-			</div><!-- /header -->
-			<div data-role="content">
-				<form action="" method="" id="loginform">
-					<div data-role="fieldcontain" class="ui-hide-label" >
-						<label for="username">Username:</label>
-						<input type="text" name="username" id="username" value="" placeholder="Username" data-mini="true" required="required"/>
-					</div>
-					<div data-role="fieldcontain" class="ui-hide-label">
-						<label for="password">Password:</label>
-						<input type="password" name="password" id="password" value="" placeholder="Password" data-mini="true" required="required"/>
-					</div>
-					<div data-role="fieldcontain">
-						<fieldset data-role="controlgroup">
-							<input type="checkbox" name="remember" id="remember" data-mini="true" />
-							<label for="remember">Remember Me</label>
-						</fieldset>
-					</div>
-					<button type="button" data-theme="a" data-mini="true" name="login" id="login" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
-						Login
-					</button>
-				</form>
-			</div><!-- /content -->
-		</div><!-- /page -->
+                        <fieldset data-role="controlgroup" data-mini="true">
+                            <input type="checkbox" name="jtmeetreq" id="jtmeetreq" class="custom"/>
+                            <label for="jtmeetreq">Jt Meet Required</label>
+                        </fieldset>
 
-		<!-- Start of first page -->
+                        <fieldset data-role="controlgroup" data-mini="true">
+                            <input type="checkbox" name="retwall" id="retwall" class="custom" />
+                            <label for="retwall">Retaining Wall</label>
+                        </fieldset>
 
-		<div data-role="dialog" id="loginfail">
+                        <fieldset data-role="controlgroup" data-mini="true">
+                            <input type="checkbox" name="tsrep" id="tsrep" class="custom" />
+                            <label for="tsrep">Top Section/Lid Replacement</label>
+                        </fieldset>
 
-			<div data-role="header" data-theme="d">
-				<h1>Login Failed</h1>
-			</div>
-			<div data-role="content" data-theme="c">
-				<p>
-					Please enter a valid Username and Password.
-				</p>
-				<a href="#loginform" data-role="button" data-rel="back" data-theme="a">Back to Login</a>
-			</div>
-		</div>
+                        <fieldset data-role="controlgroup" data-mini="true">
+                            <input type="checkbox" name="resreq" id="resreq" class="custom" data-mini="true"/>
+                            <label for="resreq" data-mini="true">Restriping Required(specify type of restriping in Remarks)</label>
+                        </fieldset>
 
-		<!-- Start of second page -->
-		<div data-role="page" id="orders">
-			<div id="logo">
-				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
-			</div>
+                        <div data-role="fieldcontain">
+                            <label for="lane" data-mini="true"><strong>If on a major street, which lane?:</strong></label>
+                            <input type="text" name="lane" placeholder="Lane" id="lane" value="" data-mini="true" />
+                        </div>
+                        <div data-role="fieldcontain" data-mini="true">
+                            <label for="select-choice-a" class="select">Special Finish:</label>
+                            <select name="select-choice-a" id="splfin" data-native-menu="false" data-mini="true">
+                                <option value="Pavers">Pavers</option>
+                                <option value="Stamped">Stamped</option>
+                                <option value="Salt">Salt</option>
+                                <option value="Rubberized">Rubberized</option>
+                                <option value="Acid Wash">Acid Wash</option>
+                                <option value="Driveway">Driveway apron</option>
+                                <option value="Curb and Gutter">Curb and Gutter</option>
+                                <option value="Colored">Colored</option>
+                                <option value="Spandrel">Spandrel</option>
+                                <option value="New Paving">New Paving</option>
+                                <option value="Brick">Brick</option>
+                                <option value="Pebbles">Pebbles</option>
+                            </select>
+                        </div>
+                        <div data-role="fieldcontain" data-mini="true">
+                            <label for="select-choice-b" class="select" data-mini="true">Street Sweeping:</label>
+                            <select name="select-choice-b" id="sweepday" data-native-menu="false" data-mini="true">
+                                <option value="Monday">Monday</option>
+                                <option value="Tuesday">Tuesday</option>
+                                <option value="Wednesday">Wednesday</option>
+                                <option value="Thursday">Thursday</option>
+                                <option value="Friday">Friday</option>
+                                <option value="Saturday">Saturday</option>
+                                <option value="Sunday">Sunday</option>
+                            </select>
 
-			<div data-role="header">
+                            <div class="ui-grid-a">
+                                <div class="ui-block-a">
+                                    <label for="ftime"><strong>From:</strong></label>
+                                    <input type="time" name="ftime" id="ftime" value="" data-mini="true"/>
+                                </div>
+                                <div class="ui-block-b">
+                                    <label for="ttime"><strong>To:</strong></label>
+                                    <input type="time" name="ttime" id="ttime" value="" data-mini="true"/>
+                                </div>
+                            </div><!-- /grid-b -->
+                        </div>
 
-				<h1>Orders</h1>
-				<a href="#loginform" data-icon="" class="ui-btn-right" id="logout">Logout</a>
-			</div><!-- /header -->
+                        <div data-role="fieldcontain">
+                            <label for="custcont" data-mini="true">Customer Contact:</label>
 
-			<div data-role="content">
-				<div class="content-primary">
-					<ul data-role="listview" data-inset="true" data-filter="true" id="order_list">
-						
-					</ul>
-				</div><!--/content-primary -->
-			</div><!-- /content -->
+                            <div class="ui-grid-a">
+                                <div class="ui-block-a">
+                                    <input type="text" name="contname" id="contname" value="" placeholder="Name" data-mini="true" />
+                                </div>
+                                <div class="ui-block-b">
+                                    <input type="text" name="custphone" id="custphone" value="" placeholder="Phone Number" data-mini="true" />
+                                </div>
 
-		</div><!-- /page -->
-		<!-- Start of third page -->
-		<div data-role="page" id="cut">
-			<div id="logo">
-				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
-			</div>
+                            </div><!-- /grid-b -->
+                        </div>
+                        <div data-role="fieldcontain">
 
-			<div data-role="header">
-				<a href="#orders" data-rel="Back" data-icon="back">Orders</a>
-				<h1>Details</h1>
-				<a href="#loginform" data-icon="">Logout</a>
-			</div><!-- /header -->
+                            <div class="ui-grid-b">
+                                <div class="ui-block-a">
+                                    <label for="x" data-mini="true"><strong>X:</strong></label>
 
-			<div data-role="content">
-				<ul data-role="listview" id="details_list">
-					<li id="ord_header">
+                                </div>
+                                <div class="ui-block-b">
+                                    <label for="y" data-mini="true"><strong>Y:</strong></label>
+                                </div>
+                                <div class="ui-block-c">
+                                    &nbsp;
+                                </div>
+                            </div><!-- /grid-b -->
 
-					</li>
-					<li>
-							<fieldset data-role="controlgroup" data-mini="true">
-								<input type="checkbox" name="arrowbn" id="arrowbn" class="custom" />
-								<label for="arrowbn">Arrowboard Needed</label>
-							</fieldset>
+                            <div class="ui-grid-b">
+                                <div class="ui-block-a">
+                                    <input type="text" name="x" id="x" value="" placeholder="X-Coordinate" data-mini="true" />
+                                </div>
+                                <div class="ui-block-b">
+                                    <input type="text" name="y" id="y" value="" placeholder="Y-Coordinate" data-mini="true" />
+                                </div>
+                                <div class="ui-block-c">
+                                    <button type="v" data-mini="true" name="latlang" id="latlang">
+                                        Get
+                                    </button>
+                                </div>
+                            </div><!-- /grid-b -->
+                        </div>
 
-							<fieldset data-role="controlgroup" data-mini="true">
-								<input type="checkbox" name="jtmeetreq" id="jtmeetreq" class="custom"/>
-								<label for="jtmeetreq">Jt Meet Required</label>
-							</fieldset>
-
-							<fieldset data-role="controlgroup" data-mini="true">
-								<input type="checkbox" name="retwall" id="retwall" class="custom" />
-								<label for="retwall">Retaining Wall</label>
-							</fieldset>
-
-							<fieldset data-role="controlgroup" data-mini="true">
-								<input type="checkbox" name="tsrep" id="tsrep" class="custom" />
-								<label for="tsrep">Top Section/Lid Replacement</label>
-							</fieldset>
-
-							<fieldset data-role="controlgroup" data-mini="true">
-								<input type="checkbox" name="resreq" id="resreq" class="custom" data-mini="true"/>
-								<label for="resreq" data-mini="true">Restriping Required(specify type of restriping in Remarks)</label>
-							</fieldset>
-
-							<div data-role="fieldcontain">
-								<label for="lane" data-mini="true"><strong>If on a major street, which lane?:</strong></label>
-								<input type="text" name="lane" placeholder="Lane" id="lane" value="" data-mini="true" />
-							</div>
-							<div data-role="fieldcontain" data-mini="true">
-								<label for="select-choice-a" class="select">Special Finish:</label>
-								<select name="select-choice-a" id="splfin" data-native-menu="false" data-mini="true">
-									<option value="Pavers">Pavers</option>
-									<option value="Stamped">Stamped</option>
-									<option value="Salt">Salt</option>
-									<option value="Rubberized">Rubberized</option>
-									<option value="Acid Wash">Acid Wash</option>
-									<option value="Driveway">Driveway apron</option>
-									<option value="Curb and Gutter">Curb and Gutter</option>
-									<option value="Colored">Colored</option>
-									<option value="Spandrel">Spandrel</option>
-									<option value="New Paving">New Paving</option>
-									<option value="Brick">Brick</option>
-									<option value="Pebbles">Pebbles</option>
-								</select>
-							</div>
-							<div data-role="fieldcontain" data-mini="true">
-								<label for="select-choice-b" class="select" data-mini="true">Street Sweeping:</label>
-								<select name="select-choice-b" id="sweepday" data-native-menu="false" data-mini="true">
-									<option value="Monday">Monday</option>
-									<option value="Tuesday">Tuesday</option>
-									<option value="Wednesday">Wednesday</option>
-									<option value="Thursday">Thursday</option>
-									<option value="Friday">Friday</option>
-									<option value="Saturday">Saturday</option>
-									<option value="Sunday">Sunday</option>
-								</select>
-
-								<div class="ui-grid-a">
-									<div class="ui-block-a">
-										<label for="ftime"><strong>From:</strong></label>
-										<input type="time" name="ftime" id="ftime" value="" data-mini="true"/>
-									</div>
-									<div class="ui-block-b">
-										<label for="ttime"><strong>To:</strong></label>
-										<input type="time" name="ttime" id="ttime" value="" data-mini="true"/>
-									</div>
-								</div><!-- /grid-b -->
-							</div>
-
-							<div data-role="fieldcontain">
-								<label for="custcont" data-mini="true">Customer Contact:</label>
-
-								<div class="ui-grid-a">
-									<div class="ui-block-a">
-										<input type="text" name="contname" id="contname" value="" placeholder="Name" data-mini="true" />
-									</div>
-									<div class="ui-block-b">
-										<input type="text" name="custphone" id="custphone" value="" placeholder="Phone Number" data-mini="true" />
-									</div>
-
-								</div><!-- /grid-b -->
-							</div>
-							<div data-role="fieldcontain">
-
-								<div class="ui-grid-b">
-									<div class="ui-block-a">
-										<label for="x" data-mini="true"><strong>X:</strong></label>
-
-									</div>
-									<div class="ui-block-b">
-										<label for="y" data-mini="true"><strong>Y:</strong></label>
-									</div>
-									<div class="ui-block-c">&nbsp;</div>
-								</div><!-- /grid-b -->
-
-								<div class="ui-grid-b">
-									<div class="ui-block-a">
-
-										<input type="text" name="x" id="x" value="" placeholder="X-Coordinate" data-mini="true" />
-									</div>
-									<div class="ui-block-b">
-
-										<input type="text" name="y" id="y" value="" placeholder="Y-Coordinate" data-mini="true" />
-									</div>
-									<div class="ui-block-c">
-										<button type="v" data-mini="true" name="latlang" id="latlang">
-											Get
-										</button>
-									</div>
-								</div><!-- /grid-b -->
-							</div>
-
-							<div data-role="fieldcontain">
-								<div class="ui-grid-solo">
-									<div class="ui-block-a">
-										<label for="textarea">Remarks:</label>
-									</div>
-								</div>
-								<div class="ui-grid-solo">
-									<div class="ui-block-a">
-										<textarea name="remarks" id="remarks"></textarea>
-									</div>
-								</div><!-- /grid-b -->
-							</div>
-
-							<div class="ui-grid-a">
-								<div class="ui-block-a">
-									<button type="button" data-mini="true" name="submit" id="submit" data-theme="a" data-mini="true" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
-									Submit
-								</button>
-								</div>
-								<div class="ui-block-b">
-									<a href="#orders" data-direction="reverse" data-role="button" data-theme="" data-mini="true">Cancel</a>
-								</div>
-							</div>
-					</li>
-				</ul>
-			</div>
-
-		</div><!-- /content -->
-
-		</div><!-- /page -->
-	</body>
+                        <div data-role="fieldcontain">
+                            <div class="ui-grid-solo">
+                                <div class="ui-block-a">
+                                    <label for="textarea">Remarks:</label>
+                                </div>
+                            </div>
+                            <div class="ui-grid-solo">
+                                <div class="ui-block-a">
+                                    <textarea name="remarks" id="remarks"></textarea>
+                                </div>
+                            </div><!-- /grid-b -->
+                        </div>
+                        <div class="ui-grid-a">
+                            <div class="ui-block-a">
+                                <button type="button" data-mini="true" name="submit" id="submit" data-theme="a" data-mini="true" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
+                                    Submit
+                                </button>
+                            </div>
+                            <div class="ui-block-b">
+                                <a href="#orders" data-direction="reverse" data-role="button" data-theme="" data-mini="true">Cancel</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div><!-- /content -->
+        </div><!-- /page -->
+    </body>
 </html>
