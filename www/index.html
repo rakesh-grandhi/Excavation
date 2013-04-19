@@ -66,6 +66,18 @@
 				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
 			</div>
 			<div data-role="header">
+				<a href="#popupMenu" data-rel="popup" data-role="button" data-transition="none" data-inline="true" data-position-to="origin" data-icon="gear" data-theme="a">Options</a>
+				<div data-role="popup" id="popupMenu" data-theme="a">
+					<ul data-role="listview" data-inset="true" data-theme="a">
+						<li data-mini="true">
+							<a href="">Sync Up</a>
+						</li>
+						<li data-mini="true">
+							<a href="">Sync Down</a>
+						</li>
+						
+					</ul>
+				</div>
 				<h1>Orders</h1>
 				<a href="#loginform" data-icon="" class="ui-btn-right" id="logout">Logout</a>
 			</div><!-- /header -->
@@ -229,7 +241,7 @@
 				</ul>
 			</div>
 		</div><!-- /content -->
-		
+
 		<div data-role="page" id="menu">
 			<div id="logo">
 				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
@@ -241,15 +253,21 @@
 			<div data-role="content">
 				<div class="content-primary">
 					<ul data-role="listview" data-inset="true" id="menu_list">
-						<li><a href="">Sync Up</a></li>
-						<li><a href="">Sync Down</a></li>
-						<li><a href="#orders">Orders</a></li>
-						
+						<li>
+							<a href="">Sync Up</a>
+						</li>
+						<li>
+							<a href="">Sync Down</a>
+						</li>
+						<li>
+							<a href="#orders">Orders</a>
+						</li>
+
 					</ul>
 				</div><!--/content-primary -->
 			</div><!-- /content -->
 		</div><!-- /page -->
-		
+
 		<!--</div> /page -->
 	</body>
 </html>
