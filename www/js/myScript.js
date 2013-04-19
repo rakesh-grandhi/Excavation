@@ -73,7 +73,7 @@ $(document).ready(function() {
 
 		Validate_Login(uname, pwd);
 		if (session == "S") {
-			$.mobile.showPageLoadingMsg();
+			//$.mobile.showPageLoadingMsg();
 			remember_me();
 			load_orders();
 			$.mobile.changePage("#orders", "fade");
@@ -83,6 +83,7 @@ $(document).ready(function() {
 	});
 
 	$('#cut_back').click(function() {
+		
 		load_orders();
 	});
 
@@ -143,7 +144,6 @@ $(document).ready(function() {
 				$('#ord_header div').remove();
 
 				$("#ord_header").append('<div align="center"><p><strong>Order #: ' + $(myXML1).find("AUFNR").text() + '</strong></p><p>Thomas Bros: ' + $(myXML1).find("TBROS").text() + '</p><p>Permit #: ' + $(myXML1).find("PERMIT_NO").text() + '</p></div>');
-
 				refresh_cut_page();
 				$.mobile.changePage("#cut", "fade");
 
@@ -343,7 +343,7 @@ $(document).ready(function() {
 			success : function(data) {
 				var myXML = $(data);
 
-				$('#orders ul').empty();
+				$('#orders #order_list').empty();
 
 				//Build Orders
 				$(myXML).find("Order").each(function() {
@@ -354,7 +354,7 @@ $(document).ready(function() {
 					if ((ProcID == "EMBO_EXD") && (Status == "N" || Status == "P"))
 					// if(ProcID == "EMBO_EXD")
 					{
-						$("#orders ul").append('<li class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait"><a href="">' + $(this).text() + '</a></li>');
+						$("#orders #order_list").append('<li class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait"><a href="">' + $(this).text() + '</a></li>');
 					}
 				});
 				$('#order_list').listview('refresh');
