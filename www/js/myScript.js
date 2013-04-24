@@ -4,7 +4,7 @@
 
 var gv_username, gv_password;
 var session = null;
-
+var isOnline = navigator.onLine;
 $(document).delegate('#cut', 'pagebeforeshow', function() {
 	$('#details_list').listview('refresh');
 });
@@ -15,7 +15,7 @@ $(document).delegate('#orders,#cut', 'pageinit', function() {
 	}
 });
 
-$(document).delegate('#orders,#cut', 'pageshow', function() {
+$(document).delegate('#orders,#cut,#loginfail', 'pageshow', function() {
 	$.mobile.loading("hide");
 });
 
@@ -55,6 +55,8 @@ $(document).on("click", ".show-page-loading-msg", function() {
 
 $(document).ready(function() {
 	//Login
+	
+	alert(isOnline);
 
 	$(function() {
 		setTimeout(hideSplash, 1000);
