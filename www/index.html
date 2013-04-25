@@ -40,7 +40,7 @@
 							<label for="remember">Remember Me</label>
 						</fieldset>
 					</div>
-					<button type="button" data-theme="a" data-mini="true" name="login" id="login" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
+					<button type="button" data-theme="b" data-mini="true" name="login" id="login" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
 						Login
 					</button>
 				</form>
@@ -121,11 +121,28 @@
 							<input type="checkbox" name="retwall" id="retwall" class="custom" />
 							<label for="retwall">Retaining Wall</label>
 						</fieldset>
-
-						<fieldset data-role="controlgroup" data-mini="true">
-							<input type="checkbox" name="tsrep" id="tsrep" class="custom" />
-							<label for="tsrep">Top Section/Lid Replacement</label>
-						</fieldset>
+						<div >
+							<div class="ui-grid-a">
+								<div class="ui-block-a">
+									<fieldset data-role="controlgroup" data-mini="true">
+										<input type="checkbox" name="tsrep" id="tsrep" class="custom" />
+										<label for="tsrep">Top Section/Lid Replacement</label>
+									</fieldset>
+								</div>
+								<div class="ui-block-b">
+									<div data-role="fieldcontain" data-mini="true">
+										<select name="tslid" id="tslid" data-native-menu="false" data-mini="true">
+											<option>Top Section/Lid Replacement</option>
+											<option value="3312">3312</option>
+											<option value="3314">3314</option>
+											<option value="3315">3315</option>
+											<option value="3316">3316</option>
+											<option value="Manhole">Manhole</option>
+										</select>
+									</div>
+								</div>
+							</div><!-- /grid-b -->
+						</div>
 
 						<fieldset data-role="controlgroup" data-mini="true">
 							<input type="checkbox" name="resreq" id="resreq" class="custom" data-mini="true"/>
@@ -137,8 +154,9 @@
 							<input type="text" name="lane" placeholder="Lane" id="lane" value="" data-mini="true" />
 						</div>
 						<div data-role="fieldcontain" data-mini="true">
-							<label for="select-choice-a" class="select">Special Finish:</label>
-							<select name="select-choice-a" id="splfin" data-native-menu="false" data-mini="true">
+							<label for="splfin" class="select" data-mini="true"><strong>Special Finish:</strong></label>
+							<select name="splfin" id="splfin" data-native-menu="false" data-mini="true">
+								<option>Special Finish</option>
 								<option value="Pavers">Pavers</option>
 								<option value="Stamped">Stamped</option>
 								<option value="Salt">Salt</option>
@@ -154,8 +172,9 @@
 							</select>
 						</div>
 						<div data-role="fieldcontain" data-mini="true">
-							<label for="select-choice-b" class="select" data-mini="true">Street Sweeping:</label>
-							<select name="select-choice-b" id="sweepday" data-native-menu="false" data-mini="true">
+							<label for="sweepday" class="select" data-mini="true"><strong>Street Sweeping:</strong></label>
+							<select name="sweepday" id="sweepday" data-native-menu="false" data-mini="true">
+								<option>Street Sweeping</option>
 								<option value="Monday">Monday</option>
 								<option value="Tuesday">Tuesday</option>
 								<option value="Wednesday">Wednesday</option>
@@ -168,11 +187,11 @@
 							<div class="ui-grid-a">
 								<div class="ui-block-a">
 									<label for="ftime"><strong>From:</strong></label>
-									<input type="time" name="ftime" id="ftime" value="" data-mini="true"/>
+									<input type="time" name="ftime" id="ftime" value="00:00" data-mini="true"/>
 								</div>
 								<div class="ui-block-b">
 									<label for="ttime"><strong>To:</strong></label>
-									<input type="time" name="ttime" id="ttime" value="" data-mini="true"/>
+									<input type="time" name="ttime" id="ttime" value="00:00" data-mini="true"/>
 								</div>
 							</div><!-- /grid-b -->
 						</div>
@@ -185,13 +204,13 @@
 									<input type="text" name="contname" id="contname" value="" placeholder="Name" data-mini="true" />
 								</div>
 								<div class="ui-block-b">
-									<input type="text" name="custphone" id="custphone" value="" placeholder="Phone Number" data-mini="true" />
+									<input type="tel" name="custphone" id="custphone" value="" placeholder="Phone Number" data-mini="true" />
 								</div>
 
 							</div><!-- /grid-b -->
 						</div>
-						<div data-role="fieldcontain">
-
+						
+						<div>
 							<div class="ui-grid-b">
 								<div class="ui-block-a">
 									<label for="x" data-mini="true"><strong>X:</strong></label>
@@ -234,7 +253,7 @@
 						</div>
 						<div class="ui-grid-a">
 							<div class="ui-block-a">
-								<button type="button" data-mini="true" name="submit" id="submit" data-theme="a" data-mini="true" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
+								<button type="button" data-mini="true" name="submit" id="submit" data-theme="b" data-mini="true" class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait">
 									Submit
 								</button>
 							</div>

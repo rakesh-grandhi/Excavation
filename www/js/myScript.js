@@ -122,9 +122,11 @@ $(document).ready(function() {
 		var keyVal;
 		for (var i = 0; i < lsLength; i++) {
 			keyVal = localStorage.key(i);
-			alert(keyVal);
-			if ((keyVal.indexOf("order") !== -1) || (keyVal.indexOf("sync") !== -1)) {
-				localStorage.removeItem(keyVal);
+			//alert(keyVal);
+			if (keyVal !== null) {
+				if ((keyVal.indexOf("order") !== -1) || (keyVal.indexOf("sync") !== -1)) {
+					localStorage.removeItem(keyVal);
+				}
 			}
 		}
 		alert("Data deleted successfully");
@@ -152,49 +154,55 @@ $(document).ready(function() {
 	});
 
 	$('#orders').delegate('li', 'click', function() {
-		var myOrdnum = $(this).text();
-		myOrdnum = myOrdnum.replace(/\s+/g, '');
+		var orderNo = $(this).text();
+		orderNo = orderNo.replace(/\s+/g, '');
 
-		var myURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + myOrdnum + "&ProcID=EMBM_EXD";
-		// console.log(myURL);
+		if (localStorage.getItem('sync') == "Y") {
+			load_order_data_from_local_storage(orderNo);
+		} else {
+			var myURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + orderNo + "&ProcID=EMBM_EXD";
+			// console.log(myURL);
 
-		$.ajax({
-			type : 'GET',
-			url : myURL,
-			dataType : "xml",
-			success : function(data) {
-				//console.log("Details XML fetch successfull");
-				var myXML1 = $(data);
+			$.ajax({
+				type : 'GET',
+				url : myURL,
+				dataType : "xml",
+				success : function(data) {
+					//console.log("Details XML fetch successfull");
+					var myXML1 = $(data);
 
-				var Order = $(myXML1).find("AUFNR").text();
-				var Oper = $(myXML1).find("OPERATION").text();
-				var TBros = $(myXML1).find("TBROS").text();
-				var Permit_No = $(myXML1).find("PERMIT_NO").text();
-				var City = $(myXML1).find("CITY").text();
-				var Perm_Expdt = $(myXML1).find("PERM_EXPDT").text();
+					var Order = $(myXML1).find("AUFNR").text();
+					var Oper = $(myXML1).find("OPERATION").text();
+					var TBros = $(myXML1).find("TBROS").text();
+					var Permit_No = $(myXML1).find("PERMIT_NO").text();
+					var City = $(myXML1).find("CITY").text();
+					var Perm_Expdt = $(myXML1).find("PERM_EXPDT").text();
 
-				localStorage.removeItem('Order');
-				localStorage.removeItem('Oper');
-				localStorage.setItem('Order', Order);
-				localStorage.setItem('Oper', Oper);
+					localStorage.removeItem('Order');
+					localStorage.removeItem('Oper');
+					localStorage.setItem('Order', Order);
+					localStorage.setItem('Oper', Oper);
 
-				//  console.log("Order #: " + Order + "TBROS:" + TBros + "Permit #:" + Permit_No);
-				$("#cut").page();
-				$('#ord_header div').remove();
+					//  console.log("Order #: " + Order + "TBROS:" + TBros + "Permit #:" + Permit_No);
+					$("#cut").page();
+					$('#ord_header div').remove();
 
-				$("#ord_header").append('<div align="center"><p><strong>Order #: ' + $(myXML1).find("AUFNR").text() + '</strong></p><p>Thomas Bros: ' + $(myXML1).find("TBROS").text() + '</p><p>Permit #: ' + $(myXML1).find("PERMIT_NO").text() + '</p></div>');
-				refresh_cut_page();
-				$.mobile.changePage("#cut", "fade");
+					$("#ord_header").append('<div align="center"><p><strong>Order #: ' + $(myXML1).find("AUFNR").text() + '</strong></p><p>Thomas Bros: ' + $(myXML1).find("TBROS").text() + '</p><p>Permit #: ' + $(myXML1).find("PERMIT_NO").text() + '</p></div>');
+					refresh_cut_page();
+					$.mobile.changePage("#cut", "fade");
 
-			},
-			error : function(a, b, c) {
-				alert("Unable to process the request, please try again later.");
-				//console.log("Unable to fetch Details XML");
-			}
-		});
+				},
+				error : function(a, b, c) {
+					alert("Unable to process the request, please try again later.");
+					//console.log("Unable to fetch Details XML");
+				}
+			});
+
+		}
+
 	});
 
-	$('#sync,#syncu,#syncd').click(function() {
+	$('#sync,#syncd').click(function() {
 		//var option = $(this).text();
 		//option = option.replace(/\s+/g, '');
 		//alert(option);
@@ -207,122 +215,192 @@ $(document).ready(function() {
 		} else {
 			alert("Unable to Sync. Make sure you are connected to internet and try again");
 		}
-
 		//}
+	});
 
+	$('#syncu').click(function() {
+		check_network();
+		if (isOnline == "Y") {
+			upload_data_from_local_storage();
+		} else {
+			alert("Unable to Sync. Make sure you are connected to internet and try again");
+		}
 	});
 
 	//Submit function in the Cut Details page
 	$('#submit').click(function() {
+
+		var arrowbn, jtmeetreq, retwall, tsrep, tsrep_val, resreq, lane, splfin_type, splfin, myOrdnum, sweepday, ftime, ttime, contname, custphone, x, y, remarks;
+
 		if ($('#arrowbn').is(":checked")) {
-			var arrowbn = "1";
+			arrowbn = "1";
 		} else {
-			var arrowbn = "0";
+			arrowbn = "0";
 		}
 
 		if ($('#jtmeetreq').is(":checked")) {
-			var jtmeetreq = "1";
+			jtmeetreq = "Y";
 		} else {
-			var jtmeetreq = "0";
+			jtmeetreq = "N";
 		}
 
 		if ($('#retwall').is(":checked")) {
-			var retwall = "1";
+			retwall = "Y";
 		} else {
-			var retwall = "0";
+			retwall = "N";
 		}
 
 		if ($('#tsrep').is(":checked")) {
-			var tsrep = "1";
+			tsrep = "1";
+			if ($('#tslid').val() != null) {
+				tsrep_val = $('#tslid').val();
+			}
 		} else {
-			var tsrep = "0";
+			tsrep = "0";
 		}
 
 		if ($('#resreq').is(":checked")) {
-			var resreq = "1";
+			resreq = "Y";
 		} else {
-			var resreq = "0";
+			resreq = "N";
 		}
 
-		var lane = $('#lane').val();
-		var splfin = $('#splfin').val();
-		var sweepday = $('#sweepday').val();
-		var ftime = $('#ftime').val();
-		var ttime = $('#ttime').val();
-		var contname = $('#contname').val();
-		var custphone = $('#custphone').val();
-		var x = $('#x').val();
-		var y = $('#y').val();
-		var remarks = $('#remarks').val();
+		lane = $('#lane').val();
 
-		var myOrdnum = localStorage.getItem('Order');
-		var myURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + myOrdnum + "&ProcID=EMBM_EXD";
+		if ($('#splfin').val() != null) {
+			splfin_type = $('#splfin').val();
+			splfin = "Y";
+		} else {
+			splfin = "N";
+		}
 
-		$.ajax({
-			type : 'GET',
-			url : myURL,
-			dataType : "xml",
-			success : function(xml) {
-				var myXML2 = parseXML(xml);
+		sweepday = $('#sweepday').val();
+		ftime = $('#ftime').val();
+		ttime = $('#ttime').val();
+		contname = $('#contname').val();
+		custphone = $('#custphone').val();
 
-				$(myXML2).find("ARROW_BOARD").text(arrowbn);
-				$(myXML2).find("RESTRIPE").text(resreq);
-				$(myXML2).find("RETAIN_WALL").text(retwall);
-				$(myXML2).find("TOP_SECTION_LID_REPL").text(tsrep);
-				$(myXML2).find("JT_MEET_REQ").text(jtmeetreq);
+		x = $('#x').val();
+		y = $('#y').val();
+		remarks = $('#remarks').val();
 
-				$(myXML2).find("MAJOR_ST_LANE").text(lane);
-				$(myXML2).find("SPEC_FINISH").text(splfin);
-				$(myXML2).find("STREET_SWEEP_DAY").text(sweepday);
-				$(myXML2).find("STREET_SWEEP_START").text(ftime);
-				$(myXML2).find("STREET_SWEEP_END").text(ttime);
-				$(myXML2).find("CUSTNAME").text(contname);
-				$(myXML2).find("CUSTTEL").text(custphone);
-				$(myXML2).find("REMARKS").text(remarks);
+		myOrdnum = localStorage.getItem('Order');
 
-				var xmlString = (new XMLSerializer()).serializeToString(myXML2);
-				var url_RoleID = "WM";
-				var url_ProcID = "EMBM_EXD";
-				var url_DocID = localStorage.getItem('Order');
-				var url_UserID = "Anica";
-				var url_ItemID = localStorage.getItem('Oper');
-				var url_Status = "C";
+		check_network();
 
-				var PURL = "http://anica.azurewebsites.net/update.asp?" + "RoleID=" + encodeURIComponent(url_RoleID) + "&ProcID=" + encodeURIComponent(url_ProcID) + "&DocID=" + encodeURIComponent(url_DocID) + "&UserID=" + encodeURIComponent(url_UserID) + "&ItemID=" + encodeURIComponent(url_ItemID) + "&Status=" + encodeURIComponent(url_Status);
+		if (isOnline == "Y") {
+			var myURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + myOrdnum + "&ProcID=EMBM_EXD";
 
-				//console.log(PURL);
+			$.ajax({
+				type : 'GET',
+				url : myURL,
+				dataType : "xml",
+				success : function(xml) {
+					var myXML2 = parseXML(xml);
 
-				$.ajax({
-					url : PURL,
-					data : xmlString,
-					processData : false,
-					contentType : false,
-					type : 'POST',
-					success : function(status) {
-						// console.log(status);
-						if (status.indexOf("1") !== -1) {
-							localStorage.removeItem('Order');
-							localStorage.removeItem('Oper');
-							//console.log("XML Updated successfully");
-							window.location.href = '#orders';
-						} else {
+					$(myXML2).find("ARROW_BOARD").text(arrowbn);
+					$(myXML2).find("RESTRIPE").text(resreq);
+					$(myXML2).find("RETAIN_WALL").text(retwall);
+					$(myXML2).find("TOP_SECTION_LID_REPL").text(tsrep_val);
+					$(myXML2).find("JT_MEET_REQ").text(jtmeetreq);
+
+					$(myXML2).find("MAJOR_ST_LANE").text(lane);
+					$(myXML2).find("SPEC_FINISH").text(splfin);
+					$(myXML2).find("SPEC_FINISH_TYPE").text(splfin_type);
+					$(myXML2).find("STREET_SWEEP_DAY").text(sweepday);
+					$(myXML2).find("STREET_SWEEP_START").text(ftime);
+					$(myXML2).find("STREET_SWEEP_END").text(ttime);
+					$(myXML2).find("CUSTNAME").text(contname);
+					$(myXML2).find("CUSTTEL").text(custphone);
+					$(myXML2).find("REMARKS").text(remarks);
+
+					var xmlString = (new XMLSerializer()).serializeToString(myXML2);
+
+					var url_RoleID = "WM";
+					var url_ProcID = "EMBM_EXD";
+					var url_DocID = localStorage.getItem('Order');
+					var url_UserID = "Anica";
+					var url_ItemID = localStorage.getItem('Oper');
+					var url_Status = "C";
+
+					var PURL = "http://anica.azurewebsites.net/update.asp?" + "RoleID=" + encodeURIComponent(url_RoleID) + "&ProcID=" + encodeURIComponent(url_ProcID) + "&DocID=" + encodeURIComponent(url_DocID) + "&UserID=" + encodeURIComponent(url_UserID) + "&ItemID=" + encodeURIComponent(url_ItemID) + "&Status=" + encodeURIComponent(url_Status);
+
+					//console.log(PURL);
+
+					$.ajax({
+						url : PURL,
+						data : xmlString,
+						processData : false,
+						contentType : false,
+						type : 'POST',
+						success : function(status) {
+							// console.log(status);
+							if (status.indexOf("1") !== -1) {
+								localStorage.removeItem('Order');
+								localStorage.removeItem('Oper');
+								//console.log("XML Updated successfully");
+								window.location.href = '#orders';
+							} else {
+								alert("Unable to process the request, please try again later.");
+								//console.log("Update Failed")
+							}
+						},
+						error : function(a, b, c) {
 							alert("Unable to process the request, please try again later.");
-							//console.log("Update Failed")
+							//console.log("XML Update Failed");
 						}
-					},
-					error : function(a, b, c) {
-						alert("Unable to process the request, please try again later.");
-						//console.log("XML Update Failed");
-					}
-				});
-			},
-			error : function(a, b, c) {
-				alert("Unable to process the request, please try again later.");
-				//console.log("Unable to fetch Details XML");
-			}
-		});
+					});
+				},
+				error : function(a, b, c) {
+					alert("Unable to process the request, please try again later.");
+					//console.log("Unable to fetch Details XML");
+				}
+			});
+		} else {
+
+			var orderDataArray = localStorage.getItem('order_data_' + myOrdnum);
+			orderDataArray = orderDataArray.split(";");
+			var orderDataXML = orderDataArray[3];
+			var myXML = textToXML(orderDataXML);
+
+			$(myXML).find("ARROW_BOARD").text(arrowbn);
+			$(myXML).find("RESTRIPE").text(resreq);
+			$(myXML).find("RETAIN_WALL").text(retwall);
+			$(myXML).find("TOP_SECTION_LID_REPL").text(tsrep);
+			$(myXML).find("JT_MEET_REQ").text(jtmeetreq);
+			$(myXML).find("MAJOR_ST_LANE").text(lane);
+			$(myXML).find("SPEC_FINISH").text(splfin);
+			$(myXML).find("STREET_SWEEP_DAY").text(sweepday);
+			$(myXML).find("STREET_SWEEP_START").text(ftime);
+			$(myXML).find("STREET_SWEEP_END").text(ttime);
+			$(myXML).find("CUSTNAME").text(contname);
+			$(myXML).find("CUSTTEL").text(custphone);
+			$(myXML).find("REMARKS").text(remarks);
+
+			var xmlString = (new XMLSerializer()).serializeToString(myXML);
+
+			var orderStatus = "C";
+			var orderDetArr = new Array();
+			//Last updated
+			orderDetArr.push(today);
+			//Order #
+			orderDetArr.push(myOrdnum);
+			//Oper #
+			orderDetArr.push(localStorage.getItem('Oper'));
+			//Order Data String
+			orderDetArr.push(xmlString);
+			//Status(N-New,C-Completed)
+			orderDetArr.push(orderStatus);
+
+			localStorage.setItem('order_data_' + myOrdnum, orderDetArr.join(";"));
+			localStorage.removeItem('Order');
+			localStorage.removeItem('Oper');
+			//console.log("XML Updated successfully");
+			window.location.href = '#orders';
+		}
 
 	});
+
 	function parseXML(xml) {
 		return xml;
 	}
@@ -370,6 +448,7 @@ $(document).ready(function() {
 	}
 
 	function refresh_cut_page() {
+		$('#tslid').val('Monday').selectmenu('refresh');
 		$('#sweepday').val('Monday').selectmenu('refresh');
 		$('#splfin').val('Pavers').selectmenu('refresh');
 		$('#ftime').val('');
@@ -438,6 +517,7 @@ $(document).ready(function() {
 		$(ordersListXML).find("Order").each(function() {
 			var ProcID = $(this).attr("ProcID");
 			var Status = $(this).attr("Status");
+			var Oper = $(this).attr("ItemID");
 
 			if ((ProcID == "EMBO_EXD") && (Status == "N" || Status == "P")) {
 
@@ -455,13 +535,20 @@ $(document).ready(function() {
 						var orderDetStr = (new XMLSerializer()).serializeToString(data);
 						var orderStatus = "N";
 						var orderDetArr = new Array();
-
+						//Last updated
 						orderDetArr.push(today);
+						//Order #
+						orderDetArr.push(orderNo);
+						//Oper #
+						orderDetArr.push(Oper);
+						//Order Data String
 						orderDetArr.push(orderDetStr);
+						//Status(N-New,C-Completed)
 						orderDetArr.push(orderStatus);
 
 						try {
 							localStorage.setItem('order_data_' + orderNo, orderDetArr.join(";"));
+							//localStorage.setItem('order_data_' + orderNo, orderDetStr);
 						} catch (e) {
 							if (e == QUOTA_EXCEEDED_ERR) {
 								console.log("Quota exceeded! for Local Storage");
@@ -475,7 +562,6 @@ $(document).ready(function() {
 				});
 			}
 		});
-
 	}
 
 	function load_orders_from_local_storage() {
@@ -491,6 +577,79 @@ $(document).ready(function() {
 		});
 	}
 
+	function load_order_data_from_local_storage(orderNo) {
+		var orderDataArray = localStorage.getItem('order_data_' + orderNo);
+		orderDataArray = orderDataArray.split(";");
+		var orderDataXML = $(orderDataArray[3]);
+
+		var Order = $(orderDataXML).find("AUFNR").text();
+		var Oper = $(orderDataXML).find("OPERATION").text();
+		var TBros = $(orderDataXML).find("TBROS").text();
+		var Permit_No = $(orderDataXML).find("PERMIT_NO").text();
+		var City = $(orderDataXML).find("CITY").text();
+		var Perm_Expdt = $(orderDataXML).find("PERM_EXPDT").text();
+
+		localStorage.removeItem('Order');
+		localStorage.removeItem('Oper');
+		localStorage.setItem('Order', Order);
+		localStorage.setItem('Oper', Oper);
+
+		//  console.log("Order #: " + Order + "TBROS:" + TBros + "Permit #:" + Permit_No);
+		$("#cut").page();
+		$('#ord_header div').remove();
+
+		$("#ord_header").append('<div align="center"><p><strong>Order #: ' + $(orderDataXML).find("AUFNR").text() + '</strong></p><p>Thomas Bros: ' + $(orderDataXML).find("TBROS").text() + '</p><p>Permit #: ' + $(orderDataXML).find("PERMIT_NO").text() + '</p></div>');
+		refresh_cut_page();
+		$.mobile.changePage("#cut", "fade");
+	}
+
+	function upload_data_from_local_storage() {
+		var lsLength = localStorage.length;
+		var keyVal;
+		for (var i = 0; i < lsLength; i++) {
+			keyVal = localStorage.key(i);
+			alert(keyVal);
+			if (keyVal.indexOf("order_data") !== -1) {
+				var orderDataArray = localStorage.getItem(keyVal);
+				orderDataArray = orderDataArray.split(";");
+				if (orderDataArray[4] == "C") {
+					var orderDataString = orderDataArray[3];
+					var url_RoleID = "WM";
+					var url_ProcID = "EMBM_EXD";
+					var url_DocID = orderDataArray[1];
+					var url_UserID = "Anica";
+					var url_ItemID = orderDataArray[2];
+					var url_Status = "C";
+
+					var PURL = "http://anica.azurewebsites.net/update.asp?" + "RoleID=" + encodeURIComponent(url_RoleID) + "&ProcID=" + encodeURIComponent(url_ProcID) + "&DocID=" + encodeURIComponent(url_DocID) + "&UserID=" + encodeURIComponent(url_UserID) + "&ItemID=" + encodeURIComponent(url_ItemID) + "&Status=" + encodeURIComponent(url_Status);
+
+					$.ajax({
+						url : PURL,
+						data : orderDataString,
+						processData : false,
+						contentType : false,
+						type : 'POST',
+						success : function(status) {
+							// console.log(status);
+							if (status.indexOf("1") !== -1) {
+								localStorage.removeItem(keyVal);
+								//console.log("XML Updated successfully");
+							} else {
+								//alert("Unable to process the request, please try again later.");
+								console.log("Update XML failed for Order #:" + orderDataArray[1])
+							}
+						},
+						error : function(a, b, c) {
+							//alert("Unable to process the request, make sure you are connected to internet");
+							console.log("No network connection");
+						}
+					});
+				}
+			}
+		}
+		alert("Sync Successfull");
+	}
+
 	function check_network() {
 		$.ajax({
 			type : 'GET',
@@ -503,7 +662,28 @@ $(document).ready(function() {
 				isOnline = "N";
 			}
 		});
+	}
 
+	function textToXML(str) {
+		try {
+			var xml = null;
+			if (window.DOMParser) {
+				var parser = new DOMParser();
+				xml = parser.parseFromString(str, "text/xml");
+				var found = xml.getElementsByTagName("parsererror");
+				if (!found || !found.length || !found[0].childNodes.length) {
+					return xml;
+				}
+				return null;
+			} else {
+				xml = new ActiveXObject("Microsoft.XMLDOM");
+				xml.async = false;
+				xml.loadXML(str);
+				return xml;
+			}
+		} catch ( e ) {
+			// suppress
+		}
 	}
 
 });
