@@ -2,11 +2,24 @@
  * @author Rakesh
  */
 
+//Global Variables
 var gv_username, gv_password;
 var session = null;
-var isOnline = navigator.onLine;
+var isOnline = null;
+
+var newDate = new Date();
+var dd = newDate.getDate();
+var mm = newDate.getMonth() + 1;
+var yyyy = newDate.getFullYear();
+var today = mm + '/' + dd + '/' + yyyy;
+//End
+
 $(document).delegate('#cut', 'pagebeforeshow', function() {
 	$('#details_list').listview('refresh');
+});
+
+$(document).delegate('#orders', 'pagebeforeshow', function() {
+	$('#order_list').listview('refresh');
 });
 
 $(document).delegate('#orders,#cut', 'pageinit', function() {
@@ -15,7 +28,7 @@ $(document).delegate('#orders,#cut', 'pageinit', function() {
 	}
 });
 
-$(document).delegate('#orders,#cut,#loginfail', 'pageshow', function() {
+$(document).delegate('#orders,#cut,#loginfail,#menu', 'pageshow', function() {
 	$.mobile.loading("hide");
 });
 
@@ -32,6 +45,7 @@ $(document).delegate('#loginform', 'pageshow', function() {
 		$('#password').attr("value", localStorage.getItem('password'));
 		$('#remember').attr('checked', true).checkboxradio("refresh");
 	}
+
 });
 
 $(document).bind('keydown', function(event) {
@@ -54,9 +68,8 @@ $(document).on("click", ".show-page-loading-msg", function() {
 });
 
 $(document).ready(function() {
-	//Login
-	
-	alert(isOnline);
+
+	//check_network();
 
 	$(function() {
 		setTimeout(hideSplash, 1000);
@@ -66,31 +79,55 @@ $(document).ready(function() {
 		$.mobile.changePage("#loginform", "fade");
 	}
 
-
+	//Login
 	$('#login').click(function() {
 		$.mobile.loading("show");
 		var uname = $("#username").val();
 		var pwd = $("#password").val();
-		//$.mobile.loading('show');
-
+		var syncd = localStorage.getItem('remember');
 		Validate_Login(uname, pwd);
 		if (session == "S") {
-			//$.mobile.showPageLoadingMsg();
 			remember_me();
-			load_orders();
-			$.mobile.changePage("#orders", "fade");
+
+			if (localStorage.getItem('sync') == "Y") {
+				load_orders_from_local_storage();
+			} else {
+				check_network();
+				if (isOnline == "Y") {
+					load_orders();
+				} else {
+					alert("Please connect to network and Sync data");
+				}
+			}
+			//$.mobile.changePage("#orders", "fade");
+			$.mobile.changePage("#menu", "fade");
 		} else {
-			$.mobile.changePage("#loginfail", "fade");
+			//$.mobile.changePage("#loginfail", "fade");
+			$.mobile.changePage("#menu", "fade");
 		}
+
 	});
 
 	$('#cut_back').click(function() {
-		
 		load_orders();
 	});
 
 	$('#logout').click(function() {
 		session = "F";
+	});
+
+	$('#delete_data').click(function() {
+		//localStorage.clear();
+		var lsLength = localStorage.length;
+		var keyVal;
+		for (var i = 0; i < lsLength; i++) {
+			keyVal = localStorage.key(i);
+			alert(keyVal);
+			if ((keyVal.indexOf("order") !== -1) || (keyVal.indexOf("sync") !== -1)) {
+				localStorage.removeItem(keyVal);
+			}
+		}
+		alert("Data deleted successfully");
 	});
 
 	$('#latlang').click(function() {
@@ -157,6 +194,24 @@ $(document).ready(function() {
 		});
 	});
 
+	$('#sync,#syncu,#syncd').click(function() {
+		//var option = $(this).text();
+		//option = option.replace(/\s+/g, '');
+		//alert(option);
+		//if(option == "SyncDown")
+		//{
+		check_network();
+		if (isOnline == "Y") {
+			localStorage.setItem('sync', "Y");
+			load_order_list_to_local_storage();
+		} else {
+			alert("Unable to Sync. Make sure you are connected to internet and try again");
+		}
+
+		//}
+
+	});
+
 	//Submit function in the Cut Details page
 	$('#submit').click(function() {
 		if ($('#arrowbn').is(":checked")) {
@@ -199,7 +254,6 @@ $(document).ready(function() {
 		var x = $('#x').val();
 		var y = $('#y').val();
 		var remarks = $('#remarks').val();
-		//console.log(arrowbn + "," + jtmeetreq + "," + retwall + "," + lane + "," + splfin + "," + sweepday + "," + contname + "," + custphone);
 
 		var myOrdnum = localStorage.getItem('Order');
 		var myURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + myOrdnum + "&ProcID=EMBM_EXD";
@@ -227,9 +281,6 @@ $(document).ready(function() {
 				$(myXML2).find("REMARKS").text(remarks);
 
 				var xmlString = (new XMLSerializer()).serializeToString(myXML2);
-
-				// console.log("XML String:" + xmlString);
-
 				var url_RoleID = "WM";
 				var url_ProcID = "EMBM_EXD";
 				var url_DocID = localStorage.getItem('Order');
@@ -248,15 +299,12 @@ $(document).ready(function() {
 					contentType : false,
 					type : 'POST',
 					success : function(status) {
-
 						// console.log(status);
-
 						if (status.indexOf("1") !== -1) {
 							localStorage.removeItem('Order');
 							localStorage.removeItem('Oper');
 							//console.log("XML Updated successfully");
 							window.location.href = '#orders';
-
 						} else {
 							alert("Unable to process the request, please try again later.");
 							//console.log("Update Failed")
@@ -267,7 +315,6 @@ $(document).ready(function() {
 						//console.log("XML Update Failed");
 					}
 				});
-
 			},
 			error : function(a, b, c) {
 				alert("Unable to process the request, please try again later.");
@@ -293,15 +340,15 @@ $(document).ready(function() {
 			async : false,
 			data : parameters,
 			success : function(status) {
-				// console.log(status);
 				if (status.indexOf("1") !== -1) {
 					session = 'S';
-					//return status;
 					//console.log("Login Successful");
 				}
-
 			},
 			error : function(a, b, c) {
+				if (uname == localStorage.getItem('username') && pwd == localStorage.getItem('password')) {
+					session = 'S';
+				}
 				//console.log("Login check failed");
 			}
 		});
@@ -311,13 +358,12 @@ $(document).ready(function() {
 		var uname = $("#username").val();
 		var pwd = $("#password").val();
 		if ($('#remember').is(":checked")) {
-
 			localStorage.setItem('username', uname);
 			localStorage.setItem('password', pwd);
 			localStorage.setItem('remember', 'true');
 		} else {
 			localStorage.clear();
-			// localStorage.removeItem('username');
+			//localStorage.removeItem('username');
 			//localStorage.removeItem('password');
 			//localStorage.removeItem('remember');
 		}
@@ -364,6 +410,97 @@ $(document).ready(function() {
 			error : function(a, b, c) {
 				alert('Unable to process your request. Please try again later');
 				//console.log('Unable to fetch Orders XML');
+			}
+		});
+	}
+
+	function load_order_list_to_local_storage() {
+		$.ajax({
+			type : 'GET',
+			url : 'http://anica.azurewebsites.net/WOList.asp?UID=&PWD=&LogIn=Log+In',
+			dataType : "xml",
+			success : function(data) {
+				var orderListStr = (new XMLSerializer()).serializeToString(data);
+				localStorage.setItem('orderList', orderListStr);
+				load_order_data_to_local_storage();
+				alert("Sync Successfull");
+			},
+			error : function(a, b, c) {
+				alert('Unable to process your request. Make sure you are connected to internet and try again');
+				//console.log('Unable to fetch Orders XML');
+			}
+		});
+	}
+
+	function load_order_data_to_local_storage() {
+		var ordersListXML = $(localStorage.getItem('orderList'));
+
+		$(ordersListXML).find("Order").each(function() {
+			var ProcID = $(this).attr("ProcID");
+			var Status = $(this).attr("Status");
+
+			if ((ProcID == "EMBO_EXD") && (Status == "N" || Status == "P")) {
+
+				var orderNo = $(this).text();
+				orderNo = orderNo.replace(/\s+/g, '');
+
+				var orderDetURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + orderNo + "&ProcID=EMBM_EXD";
+				//console.log(orderDetURL);
+
+				$.ajax({
+					type : 'GET',
+					url : orderDetURL,
+					dataType : "xml",
+					success : function(data) {
+						var orderDetStr = (new XMLSerializer()).serializeToString(data);
+						var orderStatus = "N";
+						var orderDetArr = new Array();
+
+						orderDetArr.push(today);
+						orderDetArr.push(orderDetStr);
+						orderDetArr.push(orderStatus);
+
+						try {
+							localStorage.setItem('order_data_' + orderNo, orderDetArr.join(";"));
+						} catch (e) {
+							if (e == QUOTA_EXCEEDED_ERR) {
+								console.log("Quota exceeded! for Local Storage");
+							}
+						}
+					},
+					error : function(a, b, c) {
+						//alert("Unable to process the request, please try again later.");
+						console.log("Unable to fetch Details XML in Local Storage for Order:" + orderNo);
+					}
+				});
+			}
+		});
+
+	}
+
+	function load_orders_from_local_storage() {
+		var ordersListXML = $(localStorage.getItem('orderList'));
+		$('#orders #order_list').empty();
+		$(ordersListXML).find("Order").each(function() {
+			var ProcID = $(this).attr("ProcID");
+			var Status = $(this).attr("Status");
+
+			if ((ProcID == "EMBO_EXD") && (Status == "N" || Status == "P")) {
+				$("#orders #order_list").append('<li class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait"><a href="">' + $(this).text() + '</a></li>');
+			}
+		});
+	}
+
+	function check_network() {
+		$.ajax({
+			type : 'GET',
+			url : 'http://www.google.com',
+			async : false,
+			success : function(data) {
+				isOnline = "Y";
+			},
+			error : function(a, b, c) {
+				isOnline = "N";
 			}
 		});
 

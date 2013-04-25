@@ -66,18 +66,23 @@
 				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
 			</div>
 			<div data-role="header">
+
+				<a href="#menu" data-rel="Back" data-icon="back" id="orders_back">Menu</a>
+				<!--
+				<a href="#sync" data-rel="Back" data-icon="refresh" id="sync">Sync</a>
 				<a href="#popupMenu" data-rel="popup" data-role="button" data-transition="none" data-inline="true" data-position-to="origin" data-icon="gear" data-theme="a">Options</a>
 				<div data-role="popup" id="popupMenu" data-theme="a">
-					<ul data-role="listview" data-inset="true" data-theme="a">
-						<li data-mini="true">
-							<a href="">Sync Up</a>
-						</li>
-						<li data-mini="true">
-							<a href="">Sync Down</a>
-						</li>
-						
-					</ul>
+				<ul data-role="listview" data-inset="true" data-theme="a">
+				<li data-mini="true">
+				<a href="">Sync Up</a>
+				</li>
+				<li data-mini="true">
+				<a href="">Sync Down</a>
+				</li>
+
+				</ul>
 				</div>
+				-->
 				<h1>Orders</h1>
 				<a href="#loginform" data-icon="" class="ui-btn-right" id="logout">Logout</a>
 			</div><!-- /header -->
@@ -252,15 +257,18 @@
 			</div><!-- /header -->
 			<div data-role="content">
 				<div class="content-primary">
-					<ul data-role="listview" data-inset="true" id="menu_list">
+					<ul data-role="listview" id="menu_list">
 						<li>
-							<a href="">Sync Up</a>
+							<a href="" id="syncu">Sync Up</a>
 						</li>
 						<li>
-							<a href="">Sync Down</a>
+							<a href="" id="syncd">Sync Down</a>
 						</li>
 						<li>
 							<a href="#orders">Orders</a>
+						</li>
+						<li>
+							<a href="" id="delete_data">Delete Data</a>
 						</li>
 
 					</ul>
