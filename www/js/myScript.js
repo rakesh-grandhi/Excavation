@@ -112,6 +112,11 @@ $(document).ready(function() {
 		load_orders();
 	});
 
+	$('#menu_orders').click(function() {
+		load_orders();
+		$.mobile.changePage("#orders", "fade");
+	});
+
 	$('#logout').click(function() {
 		session = "F";
 	});
@@ -152,6 +157,40 @@ $(document).ready(function() {
 		}
 
 	});
+
+	$('#map').click(function() {
+		if (navigator.geolocation) {
+			navigator.geolocation.getCurrentPosition(success, error);
+		}
+		function success(position) {
+			//Geo.lat = position.coords.latitude;
+			//Geo.lng = position.coords.longitude;
+			initialize(position.coords.latitude, position.coords.longitude);
+		}
+
+		function error() {
+			alert("Unable to get the location details");
+			//console.log("Geocoder failed");
+		}
+
+		//if (navigator.geolocation) {
+		//	navigator.geolocation.getCurrentPosition(success, (position) {
+		//		initialize(position.coords.latitude, position.coords.longitude);
+		//	});
+		//}
+	});
+
+	function initialize(lat, lng) {
+		var latlng = new google.maps.LatLng(lat, lng);
+		var myOptions = {
+			zoom : 15,
+			center : latlng,
+			mapTypeId : google.maps.MapTypeId.ROADMAP
+		};
+		var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+		$.mobile.changePage("#page_map", "fade");
+	}
+
 
 	$('#orders').delegate('li', 'click', function() {
 		var orderNo = $(this).text();
@@ -313,6 +352,8 @@ $(document).ready(function() {
 					$(myXML2).find("CUSTNAME").text(contname);
 					$(myXML2).find("CUSTTEL").text(custphone);
 					$(myXML2).find("REMARKS").text(remarks);
+					$(myXML2).find("X_COORDINATE").text(x);
+					$(myXML2).find("Y_COORDINATE").text(y);
 
 					var xmlString = (new XMLSerializer()).serializeToString(myXML2);
 
@@ -363,19 +404,23 @@ $(document).ready(function() {
 			var orderDataXML = orderDataArray[3];
 			var myXML = textToXML(orderDataXML);
 
-			$(myXML).find("ARROW_BOARD").text(arrowbn);
-			$(myXML).find("RESTRIPE").text(resreq);
-			$(myXML).find("RETAIN_WALL").text(retwall);
-			$(myXML).find("TOP_SECTION_LID_REPL").text(tsrep);
-			$(myXML).find("JT_MEET_REQ").text(jtmeetreq);
-			$(myXML).find("MAJOR_ST_LANE").text(lane);
-			$(myXML).find("SPEC_FINISH").text(splfin);
-			$(myXML).find("STREET_SWEEP_DAY").text(sweepday);
-			$(myXML).find("STREET_SWEEP_START").text(ftime);
-			$(myXML).find("STREET_SWEEP_END").text(ttime);
-			$(myXML).find("CUSTNAME").text(contname);
-			$(myXML).find("CUSTTEL").text(custphone);
-			$(myXML).find("REMARKS").text(remarks);
+			$(myXML2).find("ARROW_BOARD").text(arrowbn);
+			$(myXML2).find("RESTRIPE").text(resreq);
+			$(myXML2).find("RETAIN_WALL").text(retwall);
+			$(myXML2).find("TOP_SECTION_LID_REPL").text(tsrep_val);
+			$(myXML2).find("JT_MEET_REQ").text(jtmeetreq);
+
+			$(myXML2).find("MAJOR_ST_LANE").text(lane);
+			$(myXML2).find("SPEC_FINISH").text(splfin);
+			$(myXML2).find("SPEC_FINISH_TYPE").text(splfin_type);
+			$(myXML2).find("STREET_SWEEP_DAY").text(sweepday);
+			$(myXML2).find("STREET_SWEEP_START").text(ftime);
+			$(myXML2).find("STREET_SWEEP_END").text(ttime);
+			$(myXML2).find("CUSTNAME").text(contname);
+			$(myXML2).find("CUSTTEL").text(custphone);
+			$(myXML2).find("REMARKS").text(remarks);
+			$(myXML2).find("X_COORDINATE").text(x);
+			$(myXML2).find("Y_COORDINATE").text(y);
 
 			var xmlString = (new XMLSerializer()).serializeToString(myXML);
 
@@ -448,9 +493,9 @@ $(document).ready(function() {
 	}
 
 	function refresh_cut_page() {
-		$('#tslid').val('Monday').selectmenu('refresh');
-		$('#sweepday').val('Monday').selectmenu('refresh');
-		$('#splfin').val('Pavers').selectmenu('refresh');
+		$('#tslid').val('').selectmenu('refresh');
+		$('#sweepday').val('').selectmenu('refresh');
+		$('#splfin').val('').selectmenu('refresh');
 		$('#ftime').val('');
 		$('#ttime').val('');
 		$('#contname').val('');

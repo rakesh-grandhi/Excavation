@@ -8,6 +8,7 @@
 		<script src="js/jquery-1.9.1.min.js"></script>
 		<script src="jquery/jquery.mobile-1.3.1.js"></script>
 		<script src="js/myScript.js"></script>
+		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	</head>
 	<body>
 		<div data-role="page" data-theme="b" id="splash" style="background-color: #fff;" align="center">
@@ -88,7 +89,7 @@
 			</div><!-- /header -->
 			<div data-role="content">
 				<div class="content-primary">
-					<ul data-role="listview" data-inset="true" data-filter="true" id="order_list"></ul>
+					<ul data-role="listview" data-inset="true" data-filter="true" data-filter-placeholder="Search Orders..." id="order_list"></ul>
 				</div><!--/content-primary -->
 			</div><!-- /content -->
 		</div><!-- /page -->
@@ -187,11 +188,11 @@
 							<div class="ui-grid-a">
 								<div class="ui-block-a">
 									<label for="ftime"><strong>From:</strong></label>
-									<input type="time" name="ftime" id="ftime" value="00:00" data-mini="true"/>
+									<input type="time" name="ftime" id="ftime" placeholder="00:00" data-mini="true"/>
 								</div>
 								<div class="ui-block-b">
 									<label for="ttime"><strong>To:</strong></label>
-									<input type="time" name="ttime" id="ttime" value="00:00" data-mini="true"/>
+									<input type="time" name="ttime" id="ttime" placeholder="00:00" data-mini="true"/>
 								</div>
 							</div><!-- /grid-b -->
 						</div>
@@ -209,7 +210,7 @@
 
 							</div><!-- /grid-b -->
 						</div>
-						
+
 						<div>
 							<div class="ui-grid-b">
 								<div class="ui-block-a">
@@ -224,7 +225,7 @@
 								</div>
 							</div><!-- /grid-b -->
 
-							<div class="ui-grid-b">
+							<div class="ui-grid-c">
 								<div class="ui-block-a">
 									<input type="text" name="x" id="x" value="" placeholder="X-Coordinate" data-mini="true" />
 								</div>
@@ -234,6 +235,11 @@
 								<div class="ui-block-c">
 									<button type="v" data-mini="true" name="latlang" id="latlang">
 										Get
+									</button>
+								</div>
+								<div class="ui-block-d">
+									<button type="v" data-mini="true" name="map" id="map">
+										Map
 									</button>
 								</div>
 							</div><!-- /grid-b -->
@@ -284,17 +290,23 @@
 							<a href="" id="syncd">Sync Down</a>
 						</li>
 						<li>
-							<a href="#orders">Orders</a>
+							<a href="" id="menu_orders">Orders</a>
 						</li>
 						<li>
 							<a href="" id="delete_data">Delete Data</a>
 						</li>
-
 					</ul>
 				</div><!--/content-primary -->
 			</div><!-- /content -->
 		</div><!-- /page -->
 
-		<!--</div> /page -->
+		<div data-role="page" id="page_map">
+			<div data-role="content">
+				<div id="map_canvas">
+
+				</div>
+			</div>
+		</div>
+		<!-- /page -->
 	</body>
 </html>
