@@ -6,6 +6,7 @@
 var gv_username, gv_password;
 var session = null;
 var isOnline = null;
+var statusMsg = null;
 
 var newDate = new Date();
 var dd = newDate.getDate();
@@ -16,6 +17,10 @@ var today = mm + '/' + dd + '/' + yyyy;
 
 $(document).delegate('#cut', 'pagebeforeshow', function() {
 	$('#details_list').listview('refresh');
+});
+
+$(document).delegate('#menu', 'pagebeforeshow', function() {
+	$('#menu_list').listview('refresh');
 });
 
 $(document).delegate('#orders', 'pagebeforeshow', function() {
@@ -44,6 +49,10 @@ $(document).delegate('#loginform', 'pageshow', function() {
 		$('#username').attr("value", localStorage.getItem('username'));
 		$('#password').attr("value", localStorage.getItem('password'));
 		$('#remember').attr('checked', true).checkboxradio("refresh");
+	} else {
+		$('#username').attr("value", '');
+		$('#password').attr("value", '');
+		$('#remember').attr('checked', false).checkboxradio("refresh");
 	}
 
 });
@@ -88,22 +97,27 @@ $(document).ready(function() {
 		Validate_Login(uname, pwd);
 		if (session == "S") {
 			remember_me();
-
-			if (localStorage.getItem('sync') == "Y") {
-				load_orders_from_local_storage();
-			} else {
-				check_network();
-				if (isOnline == "Y") {
-					load_orders();
-				} else {
-					alert("Please connect to network and Sync data");
-				}
-			}
+			/*
+			 if (localStorage.getItem('sync') == "Y") {
+			 load_orders_from_local_storage();
+			 } else {
+			 check_network();
+			 if (isOnline == "Y") {
+			 load_orders();
+			 } else {
+			 alert("Please connect to network and Sync data");
+			 }
+			 }
+			 */
+			order_count_to_sync_up();
 			//$.mobile.changePage("#orders", "fade");
-			$.mobile.changePage("#menu", "fade");
+			$.mobile.changePage("#menu", "flow");
 		} else {
-			//$.mobile.changePage("#loginfail", "fade");
-			$.mobile.changePage("#menu", "fade");
+			localStorage.removeItem('remember');
+			$('#username').attr("value", '');
+			$('#password').attr("value", '');
+			$('#remember').attr('checked', false).checkboxradio("refresh");
+			$.mobile.changePage("#loginfail", "fade");
 		}
 
 	});
@@ -112,9 +126,29 @@ $(document).ready(function() {
 		load_orders();
 	});
 
+	$('#orders_back').click(function() {
+		order_count_to_sync_up();
+	});
+
 	$('#menu_orders').click(function() {
 		load_orders();
 		$.mobile.changePage("#orders", "fade");
+		/*
+		 var ord_cnt;
+
+		 ord_cnt = load_orders();
+		 alert(ord_cnt);
+		 if (ord_cnt > 0) {
+		 $.mobile.changePage("#orders", "fade");
+		 } else {
+		 //check_network();
+		 if (isOnline == "Y") {
+		 alert("There are no orders assigned to you");
+		 } else {
+		 alert("Please connect to network and sync");
+		 }
+		 }
+		 */
 	});
 
 	$('#logout').click(function() {
@@ -130,11 +164,17 @@ $(document).ready(function() {
 			//alert(keyVal);
 			if (keyVal !== null) {
 				if ((keyVal.indexOf("order") !== -1) || (keyVal.indexOf("sync") !== -1)) {
+					//alert(keyVal);
 					localStorage.removeItem(keyVal);
 				}
 			}
 		}
-		alert("Data deleted successfully");
+		load_orders();
+		order_count_to_sync_up();
+		$('#menu_list').listview('refresh');
+		statusMsg = "Data deleted successfully";
+		toast(statusMsg);
+		//alert("Data deleted successfully");
 	});
 
 	$('#latlang').click(function() {
@@ -152,7 +192,9 @@ $(document).ready(function() {
 		}
 
 		function error() {
-			alert("Unable to get the location details");
+			//alert("Unable to get the location details");
+			statusMsg = "Unable to get the location details";
+			toast(statusMsg);
 			//console.log("Geocoder failed");
 		}
 
@@ -169,7 +211,9 @@ $(document).ready(function() {
 		}
 
 		function error() {
-			alert("Unable to get the location details");
+			//alert("Unable to get the location details");
+			statusMsg = "Unable to get the location details";
+			toast(statusMsg);
 			//console.log("Geocoder failed");
 		}
 
@@ -196,7 +240,7 @@ $(document).ready(function() {
 		var orderNo = $(this).text();
 		orderNo = orderNo.replace(/\s+/g, '');
 
-		if (localStorage.getItem('sync') == "Y") {
+		if (localStorage.getItem('sync') == "Y" && localStorage.getItem('order_data_' + orderNo) != null) {
 			load_order_data_from_local_storage(orderNo);
 		} else {
 			var myURL = "http://anica.azurewebsites.net/WODetail.asp?ORDID=" + orderNo + "&ProcID=EMBM_EXD";
@@ -232,7 +276,9 @@ $(document).ready(function() {
 
 				},
 				error : function(a, b, c) {
-					alert("Unable to process the request, please try again later.");
+					//alert("Unable to process the request, please try again later.");
+					statusMsg = "Unable to process the request, please try again later.";
+					toast(statusMsg);
 					//console.log("Unable to fetch Details XML");
 				}
 			});
@@ -252,7 +298,10 @@ $(document).ready(function() {
 			localStorage.setItem('sync', "Y");
 			load_order_list_to_local_storage();
 		} else {
-			alert("Unable to Sync. Make sure you are connected to internet and try again");
+			statusMsg = "Unable to Sync. Make sure you are connected to internet and try again";
+			//display_toast(statusMsg);
+			toast(statusMsg);
+			//alert("Unable to Sync. Make sure you are connected to internet and try again");
 		}
 		//}
 	});
@@ -261,8 +310,12 @@ $(document).ready(function() {
 		check_network();
 		if (isOnline == "Y") {
 			upload_data_from_local_storage();
+			order_count_to_sync_up();
+			$('#menu_list').listview('refresh');
 		} else {
-			alert("Unable to Sync. Make sure you are connected to internet and try again");
+			statusMsg = "Unable to Sync. Make sure you are connected to internet and try again";
+			toast(statusMsg);
+			//alert("Unable to Sync. Make sure you are connected to internet and try again");
 		}
 	});
 
@@ -291,7 +344,7 @@ $(document).ready(function() {
 
 		if ($('#tsrep').is(":checked")) {
 			tsrep = "1";
-			if ($('#tslid').val() != null) {
+			if ($('#tslid').val() != "default") {
 				tsrep_val = $('#tslid').val();
 			}
 		} else {
@@ -306,14 +359,17 @@ $(document).ready(function() {
 
 		lane = $('#lane').val();
 
-		if ($('#splfin').val() != null) {
+		if ($('#splfin').val() != "default") {
 			splfin_type = $('#splfin').val();
 			splfin = "Y";
 		} else {
 			splfin = "N";
 		}
 
-		sweepday = $('#sweepday').val();
+		if ($('#sweepday').val() != "default") {
+			sweepday = $('#sweepday').val();
+		}
+
 		ftime = $('#ftime').val();
 		ttime = $('#ttime').val();
 		contname = $('#contname').val();
@@ -382,18 +438,24 @@ $(document).ready(function() {
 								//console.log("XML Updated successfully");
 								window.location.href = '#orders';
 							} else {
-								alert("Unable to process the request, please try again later.");
+								//alert("Unable to process the request, please try again later.");
+								statusMsg = "Unable to process the request, please try again later.";
+								toast(statusMsg);
 								//console.log("Update Failed")
 							}
 						},
 						error : function(a, b, c) {
-							alert("Unable to process the request, please try again later.");
+							//alert("Unable to process the request, please try again later.");
+							statusMsg = "Unable to process the request, please try again later.";
+							toast(statusMsg);
 							//console.log("XML Update Failed");
 						}
 					});
 				},
 				error : function(a, b, c) {
-					alert("Unable to process the request, please try again later.");
+					//alert("Unable to process the request, please try again later.");
+					statusMsg = "Unable to process the request, please try again later.";
+					toast(statusMsg);
 					//console.log("Unable to fetch Details XML");
 				}
 			});
@@ -404,23 +466,23 @@ $(document).ready(function() {
 			var orderDataXML = orderDataArray[3];
 			var myXML = textToXML(orderDataXML);
 
-			$(myXML2).find("ARROW_BOARD").text(arrowbn);
-			$(myXML2).find("RESTRIPE").text(resreq);
-			$(myXML2).find("RETAIN_WALL").text(retwall);
-			$(myXML2).find("TOP_SECTION_LID_REPL").text(tsrep_val);
-			$(myXML2).find("JT_MEET_REQ").text(jtmeetreq);
+			$(myXML).find("ARROW_BOARD").text(arrowbn);
+			$(myXML).find("RESTRIPE").text(resreq);
+			$(myXML).find("RETAIN_WALL").text(retwall);
+			$(myXML).find("TOP_SECTION_LID_REPL").text(tsrep_val);
+			$(myXML).find("JT_MEET_REQ").text(jtmeetreq);
 
-			$(myXML2).find("MAJOR_ST_LANE").text(lane);
-			$(myXML2).find("SPEC_FINISH").text(splfin);
-			$(myXML2).find("SPEC_FINISH_TYPE").text(splfin_type);
-			$(myXML2).find("STREET_SWEEP_DAY").text(sweepday);
-			$(myXML2).find("STREET_SWEEP_START").text(ftime);
-			$(myXML2).find("STREET_SWEEP_END").text(ttime);
-			$(myXML2).find("CUSTNAME").text(contname);
-			$(myXML2).find("CUSTTEL").text(custphone);
-			$(myXML2).find("REMARKS").text(remarks);
-			$(myXML2).find("X_COORDINATE").text(x);
-			$(myXML2).find("Y_COORDINATE").text(y);
+			$(myXML).find("MAJOR_ST_LANE").text(lane);
+			$(myXML).find("SPEC_FINISH").text(splfin);
+			$(myXML).find("SPEC_FINISH_TYPE").text(splfin_type);
+			$(myXML).find("STREET_SWEEP_DAY").text(sweepday);
+			$(myXML).find("STREET_SWEEP_START").text(ftime);
+			$(myXML).find("STREET_SWEEP_END").text(ttime);
+			$(myXML).find("CUSTNAME").text(contname);
+			$(myXML).find("CUSTTEL").text(custphone);
+			$(myXML).find("REMARKS").text(remarks);
+			$(myXML).find("X_COORDINATE").text(x);
+			$(myXML).find("Y_COORDINATE").text(y);
 
 			var xmlString = (new XMLSerializer()).serializeToString(myXML);
 
@@ -441,6 +503,7 @@ $(document).ready(function() {
 			localStorage.removeItem('Order');
 			localStorage.removeItem('Oper');
 			//console.log("XML Updated successfully");
+			load_orders();
 			window.location.href = '#orders';
 		}
 
@@ -466,11 +529,17 @@ $(document).ready(function() {
 				if (status.indexOf("1") !== -1) {
 					session = 'S';
 					//console.log("Login Successful");
+				} else {
+					session = 'F';
 				}
 			},
 			error : function(a, b, c) {
-				if (uname == localStorage.getItem('username') && pwd == localStorage.getItem('password')) {
+				//alert(localStorage.getItem('username'));
+				//alert(localStorage.getItem('password'));
+				if ((uname == localStorage.getItem('username')) && (pwd == localStorage.getItem('password'))) {
 					session = 'S';
+				} else {
+					session = 'F';
 				}
 				//console.log("Login check failed");
 			}
@@ -508,34 +577,60 @@ $(document).ready(function() {
 	}
 
 	function load_orders() {
-		$.ajax({
-			type : 'GET',
-			url : 'http://anica.azurewebsites.net/WOList.asp?UID=&PWD=&LogIn=Log+In',
-			dataType : "xml",
-			success : function(data) {
-				var myXML = $(data);
+		var order_cnt = 0;
+		check_network();
+		if (isOnline == "Y") {
+			//alert("Online");
+			$.ajax({
+				type : 'GET',
+				url : 'http://anica.azurewebsites.net/WOList.asp?UID=&PWD=&LogIn=Log+In',
+				dataType : "xml",
+				success : function(data) {
+					var myXML = $(data);
 
-				$('#orders #order_list').empty();
+					$('#orders #order_list').empty();
+					//Build Orders
+					$(myXML).find("Order").each(function() {
+						var ProcID = $(this).attr("ProcID");
+						var Status = $(this).attr("Status");
+						//  console.log("ProcID: " + ProcID + "Status: " + Status);
 
-				//Build Orders
-				$(myXML).find("Order").each(function() {
-					var ProcID = $(this).attr("ProcID");
-					var Status = $(this).attr("Status");
-					//  console.log("ProcID: " + ProcID + "Status: " + Status);
+						if ((ProcID == "EMBO_EXD") && (Status == "N" || Status == "P"))
+						// if(ProcID == "EMBO_EXD")
+						{
+							$("#orders #order_list").append('<li class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait"><a href="">' + $(this).text() + '</a></li>');
+							order_cnt = order_cnt + 1;
+						}
+					});
+					//$('#order_list').listview('refresh');
+				},
+				error : function(a, b, c) {
+					//alert('Unable to process your request. Please try again later');
+					statusMsg = "Unable to process the request, please try again later.";
+					toast(statusMsg);
+					//console.log('Unable to fetch Orders XML');
+				}
+			});
 
-					if ((ProcID == "EMBO_EXD") && (Status == "N" || Status == "P"))
-					// if(ProcID == "EMBO_EXD")
-					{
-						$("#orders #order_list").append('<li class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait"><a href="">' + $(this).text() + '</a></li>');
+		} else {
+			var keyVal, lsLength, orderDataArray;
+			lsLength = localStorage.length;
+			$('#orders #order_list').empty();
+			for (var i = 0; i < lsLength; i++) {
+				keyVal = localStorage.key(i);
+				//alert(keyVal);
+				if (keyVal.indexOf("order_data") !== -1) {
+					orderDataArray = localStorage.getItem(keyVal);
+					orderDataArray = orderDataArray.split(";");
+					if (orderDataArray[4] == "N") {
+						order_cnt = order_cnt + 1;
+						$("#orders #order_list").append('<li class="show-page-loading-msg" data-textonly="false" data-textvisible="true" data-msgtext="Please Wait"><a href="">' + orderDataArray[1] + '</a></li>');
 					}
-				});
-				$('#order_list').listview('refresh');
-			},
-			error : function(a, b, c) {
-				alert('Unable to process your request. Please try again later');
-				//console.log('Unable to fetch Orders XML');
+				}
 			}
-		});
+			//$('#order_list').listview('refresh');
+		}
+		return order_cnt;
 	}
 
 	function load_order_list_to_local_storage() {
@@ -547,10 +642,15 @@ $(document).ready(function() {
 				var orderListStr = (new XMLSerializer()).serializeToString(data);
 				localStorage.setItem('orderList', orderListStr);
 				load_order_data_to_local_storage();
-				alert("Sync Successfull");
+				statusMsg = "Sync Successfull";
+				//display_toast(statusMsg);
+				toast(statusMsg);
+				//alert("Sync Successfull");
 			},
 			error : function(a, b, c) {
-				alert('Unable to process your request. Make sure you are connected to internet and try again');
+				//alert('Unable to process your request. Make sure you are connected to internet and try again');
+				statusMsg = "Unable to process your request. Make sure you are connected to internet and try again";
+				toast(statusMsg);
 				//console.log('Unable to fetch Orders XML');
 			}
 		});
@@ -650,10 +750,10 @@ $(document).ready(function() {
 
 	function upload_data_from_local_storage() {
 		var lsLength = localStorage.length;
-		var keyVal;
+		var keyVal, not_synced = 0;
 		for (var i = 0; i < lsLength; i++) {
 			keyVal = localStorage.key(i);
-			alert(keyVal);
+
 			if (keyVal.indexOf("order_data") !== -1) {
 				var orderDataArray = localStorage.getItem(keyVal);
 				orderDataArray = orderDataArray.split(";");
@@ -677,9 +777,10 @@ $(document).ready(function() {
 						success : function(status) {
 							// console.log(status);
 							if (status.indexOf("1") !== -1) {
-								localStorage.removeItem(keyVal);
+
 								//console.log("XML Updated successfully");
 							} else {
+								not_synced = not_synced + 1;
 								//alert("Unable to process the request, please try again later.");
 								console.log("Update XML failed for Order #:" + orderDataArray[1])
 							}
@@ -692,13 +793,40 @@ $(document).ready(function() {
 				}
 			}
 		}
-		alert("Sync Successfull");
+		if (not_synced >= 1) {
+			statusMsg = "Unable to sync. Make sure you are connected to network";
+			toast(statusMsg);
+			//alert("Unable to Sync");
+		} else {
+			localStorage.clear();
+			//alert("Sync successfull");
+			statusMsg = "Sync successfull";
+			toast(statusMsg);
+		}
+
+	}
+
+	function order_count_to_sync_up() {
+		var keyVal, lsLength, orderDataArray, order_cnt = 0;
+		lsLength = localStorage.length;
+		for (var i = 0; i < lsLength; i++) {
+			keyVal = localStorage.key(i);
+			//alert(keyVal);
+			if (keyVal.indexOf("order_data") !== -1) {
+				orderDataArray = localStorage.getItem(keyVal);
+				orderDataArray = orderDataArray.split(";");
+				if (orderDataArray[4] == "C") {
+					order_cnt = order_cnt + 1;
+				}
+			}
+		}
+		$("#syncu").append('<span class="ui-li-count">' + order_cnt + '</span>');
 	}
 
 	function check_network() {
 		$.ajax({
 			type : 'GET',
-			url : 'http://www.google.com',
+			url : 'http://anica.azurewebsites.net/WOList.asp?UID=&PWD=&LogIn=Log+In',
 			async : false,
 			success : function(data) {
 				isOnline = "Y";
@@ -729,6 +857,35 @@ $(document).ready(function() {
 		} catch ( e ) {
 			// suppress
 		}
+	}
+
+	function display_toast(msg) {
+		$("<div class='ui-loader ui-overlay-shadow ui-body-a ui-corner-all'><p>" + msg + "</p></div>").css({
+			"display" : "block",
+			"opacity" : 0.96,
+			"top" : $(window).scrollTop() + 300
+			//"vertical-align" : "middle"
+		}).appendTo($.mobile.pageContainer).delay(1500).fadeOut(400, function() {
+			$(this).remove();
+		});
+	}
+
+	function toast(sMessage) {
+		var container = $(document.createElement("div"));
+		container.addClass("toast");
+
+		var message = $(document.createElement("div"));
+		message.addClass("message");
+		message.text(sMessage);
+		message.appendTo(container);
+
+		container.appendTo(document.body);
+
+		container.delay(100).fadeIn("slow", function() {
+			$(this).delay(2000).fadeOut("slow", function() {
+				$(this).remove();
+			});
+		});
 	}
 
 });
