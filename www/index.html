@@ -9,6 +9,7 @@
 		<script src="js/jquery-1.9.1.min.js"></script>
 		<script src="jquery/jquery.mobile-1.3.1.js"></script>
 		<script src="js/myScript.js"></script>
+		<script src="js/cordova-2.6.0.js"></script>
 		<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 	</head>
 	<body>
@@ -61,8 +62,6 @@
 				<a href="#loginform" data-role="button" data-rel="back" data-theme="a">Back to Login</a>
 			</div>
 		</div><!-- /page -->
-
-
 
 		<!-- Start of Orders page -->
 		<div data-role="page" id="orders">
@@ -236,12 +235,12 @@
 									<input type="text" name="y" id="y" value="" placeholder="Y-Coordinate" data-mini="true" />
 								</div>
 								<div class="ui-block-c">
-									<button type="v" data-mini="true" name="latlang" id="latlang">
+									<button type="v" data-mini="true" name="latlang" id="latlang" data-theme="a">
 										Get
 									</button>
 								</div>
 								<div class="ui-block-d">
-									<button type="v" data-mini="true" name="map" id="map">
+									<button type="v" data-mini="true" name="map" id="map" data-theme="a">
 										Map
 									</button>
 								</div>
@@ -298,12 +297,23 @@
 						<li>
 							<a href="" id="delete_data">Delete Data</a>
 						</li>
+						<li>
+							<a href="" id="exit">Exit</a>
+						</li>
 					</ul>
 				</div><!--/content-primary -->
 			</div><!-- /content -->
 		</div><!-- /page -->
 
 		<div data-role="page" id="page_map">
+			<div id="logo">
+				<img id="logo" src="images/logo.jpg" width="100%" height="61"/>
+			</div>
+			<div data-role="header">
+				<a href="#cut" data-rel="Back" data-icon="back" id="cut_back">Details</a>
+				<h1>Map</h1>
+				<a href="#loginform" data-icon="" class="ui-btn-right" id="logout">Logout</a>
+			</div><!-- /header -->
 			<div data-role="content">
 				<div id="map_canvas">
 

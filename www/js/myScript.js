@@ -76,12 +76,27 @@ $(document).on("click", ".show-page-loading-msg", function() {
 	});
 });
 
+$(document).bind("mobileinit", function() {
+	// Make your jQuery Mobile framework configuration changes here!
+
+	$.mobile.allowCrossDomainPages = true;
+});
+
+document.addEventListener("backbutton", function() {
+	alert("Someone pressed me");
+}, false);
+
+function onDeviceReady() {
+	document.addEventListener("pause", onPause, false);
+}
+
+
 $(document).ready(function() {
 
 	//check_network();
 
 	$(function() {
-		setTimeout(hideSplash, 1000);
+		setTimeout(hideSplash, 2000);
 	});
 
 	function hideSplash() {
@@ -176,6 +191,22 @@ $(document).ready(function() {
 		toast(statusMsg);
 		//alert("Data deleted successfully");
 	});
+
+	$('#exit').click(function() {
+		navigator.app.exitApp();
+	});
+	/*
+	 document.addEventListener("exit", function() {
+	 navigator.notification.confirm('Do you want to quit', onConfirmQuit, 'QUIT TITLE', 'OK,Cancel');
+	 }, true);
+
+	 function onConfirmQuit(button) {
+	 if (button == "1") {
+	 navigator.app.exitApp();
+	 }
+	 }
+
+	 */
 
 	$('#latlang').click(function() {
 		var Geo = {};
@@ -602,7 +633,7 @@ $(document).ready(function() {
 							order_cnt = order_cnt + 1;
 						}
 					});
-					//$('#order_list').listview('refresh');
+					$('#order_list').listview('refresh');
 				},
 				error : function(a, b, c) {
 					//alert('Unable to process your request. Please try again later');
@@ -859,16 +890,18 @@ $(document).ready(function() {
 		}
 	}
 
-	function display_toast(msg) {
-		$("<div class='ui-loader ui-overlay-shadow ui-body-a ui-corner-all'><p>" + msg + "</p></div>").css({
-			"display" : "block",
-			"opacity" : 0.96,
-			"top" : $(window).scrollTop() + 300
-			//"vertical-align" : "middle"
-		}).appendTo($.mobile.pageContainer).delay(1500).fadeOut(400, function() {
-			$(this).remove();
-		});
-	}
+	/*
+	 function display_toast(msg) {
+	 $("<div class='ui-loader ui-overlay-shadow ui-body-a ui-corner-all'><p>" + msg + "</p></div>").css({
+	 "display" : "block",
+	 "opacity" : 0.96,
+	 "top" : $(window).scrollTop() + 300
+	 //"vertical-align" : "middle"
+	 }).appendTo($.mobile.pageContainer).delay(1500).fadeOut(400, function() {
+	 $(this).remove();
+	 });
+	 }
+	 */
 
 	function toast(sMessage) {
 		var container = $(document.createElement("div"));
@@ -886,6 +919,10 @@ $(document).ready(function() {
 				$(this).remove();
 			});
 		});
+	}
+
+	function onPause() {
+		navigator.app.exitApp();
 	}
 
 });
